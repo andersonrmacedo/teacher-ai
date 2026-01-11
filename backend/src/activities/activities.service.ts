@@ -155,4 +155,28 @@ export class ActivitiesService {
 
     return data as ActivityData;
   }
+
+  async delete(id: string): Promise<{ message: string }> {
+    const { data, error } = await this.supabase
+      .from('activities')
+      .delete()
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('Erro ao deletar atividade no Supabase:', error);
+      throw new HttpException(
+        `Erro ao deletar atividade: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (!data || data.length === 0) {
+      throw new HttpException('Atividade não encontrada', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      message: 'Atividade deletada com sucesso',
+    };
+  }
 }
